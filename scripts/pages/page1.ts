@@ -3,12 +3,13 @@ import Label from '@smartface/native/ui/label';
 import { Route, Router } from '@smartface/router';
 import { styleableComponentMixin } from '@smartface/styling-context';
 import { i18n } from '@smartface/i18n';
-
+import {sc} from 'services/jsonplaceholder'
 class StyleableLabel extends styleableComponentMixin(Label) {}
 
 export default class Page1 extends Page1Design {
   private disposeables: (() => void)[] = [];
   lbl: StyleableLabel;
+  data: []
   constructor(private router?: Router, private route?: Route) {
     super({});
     this.lbl = new StyleableLabel();
@@ -33,6 +34,30 @@ export default class Page1 extends Page1Design {
       })
     );
   }
+
+
+async getAllPost()  {
+    try{
+        const response = await sc.request({
+            url: `/posts`,
+            method: 'GET',
+            headers:{
+            }
+        })
+        return response.data;
+    }catch(err){
+        console.log('ERRROR' ,err);
+        throw err;
+    }
+}
+
+
+// Crash'e sebep olan kod
+async  fetchList() {
+    const resp = await this.getAllPost();
+    this.data = resp;
+    console.log(this.data, 'data');
+}
   /**
    * @event onLoad
    * This event is called once when page is created.
@@ -45,6 +70,7 @@ export default class Page1 extends Page1Design {
     this.addChild(this.lbl, 'page1lbl1unique', 'sf-label', (userProps: Record<string, any>) => {
       return { ...userProps };
     });
+    this.fetchList();
   }
 
   onHide(): void {
